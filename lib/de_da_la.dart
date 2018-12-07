@@ -1,5 +1,4 @@
 import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/caches/EmptyCache.dart';
 import 'package:dedala_dart/caches/lambda_cache.dart';
 import 'package:dedala_dart/compose/cache_connection.dart';
 import 'package:dedala_dart/policy/read_policy.dart';
@@ -10,7 +9,7 @@ import 'package:rxdart/rxdart.dart';
 class DeDaLa<K, V> implements Cache<K, V> {
   final Cache<K, V> _cache;
 
-  DeDaLa() : _cache = EmptyCache();
+  DeDaLa() : _cache = null;
 
   DeDaLa._internal(this._cache);
 
@@ -35,7 +34,8 @@ class DeDaLa<K, V> implements Cache<K, V> {
       {@required Cache<K, V> source,
       InsertPolicy<V> insertPolicy,
       ReadPolicy<V> readPolicy}) {
-    //TODO find better way of handling this
+    //TODO
+    // find better way of handling this
     // since this will ignore all insert and read polices for the first cache
     if (_cache == null) {
       return DeDaLa._internal(source);
