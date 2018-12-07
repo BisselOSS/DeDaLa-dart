@@ -7,14 +7,14 @@ typedef Observable Set<K, V>(K key, V value);
 
 @immutable
 class LambdaCache<K, V> implements Cache<K, V> {
-  final Get<K, V> getHandler;
-  final Set<K, V> setHandler;
+  final Get<K, V> readFrom;
+  final Set<K, V> insertTo;
 
-  LambdaCache(this.getHandler, this.setHandler);
-
-  @override
-  Observable<V> get(K key) => getHandler(key);
+  LambdaCache({@required this.readFrom, @required this.insertTo});
 
   @override
-  Observable<void> set(K key, V value) => setHandler(key, value);
+  Observable<V> get(K key) => readFrom(key);
+
+  @override
+  Observable<void> set(K key, V value) => insertTo(key, value);
 }

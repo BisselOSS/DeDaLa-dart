@@ -1,6 +1,8 @@
 import 'package:dedala_dart/cache.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
+@immutable
 class MemoryCache<K, V> implements Cache<K, V> {
   final Map<K, V> _map = Map<K, V>();
 
