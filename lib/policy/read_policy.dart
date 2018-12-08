@@ -19,5 +19,5 @@ abstract class ReadPolicy<T> {
   static ReadPolicy<T> Gated<T>({@required Duration duration}) =>
       GatedReadPolicy<T>(duration);
 
-  static ReadPolicy<T> Fallback<T>() => FallbackReadPolicy();
+  static ReadPolicy<T> IfEmpty<T>() => IfEmptyReadPolicy();
 }

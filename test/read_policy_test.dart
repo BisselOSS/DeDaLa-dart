@@ -27,19 +27,25 @@ void main() {
       expect(request, emitsInOrder(<int>[userCount, 0]));
     });
 
-    test('Always <-> Never: emits once', () {
-      var deDaLa = DeDaLa<String, String>()
+    test('IfEmpty: reads second cache if previous cache was empty', () {
+      var deDaLa = DeDaLa<int, String>()
+          .connect(readFrom: (id) => Observable<String>.just(null))
           .connect(
-              readPolicy: ReadPolicy.Always(),
-              readFrom: (id) =>
-                  Observable.just(users).delay(Duration(milliseconds: 20)))
+              readPolicy: ReadPolicy.IfEmpty(),
+              readFrom: (id) => Observable.just("Hey there"));
+
+      expect(deDaLa.get(0), emitsInOrder(<String>[null, "Hey there"]));
+    });
+
+    test('IfEmpty: does not read second cache if previous cache has content',
+        () {
+      var deDaLa = DeDaLa<int, String>()
+          .connect(readFrom: (id) => Observable<String>.just("some result"))
           .connect(
-              readPolicy: ReadPolicy.Always(),
-              readFrom: (id) => Observable.just(List()));
+              readPolicy: ReadPolicy.IfEmpty(),
+              readFrom: (id) => Observable.just("Hey there"));
 
-      var request = deDaLa.get(userId).map((users) => users.length);
-
-      expect(request, emitsInOrder(<int>[userCount, 0]));
+      expect(deDaLa.get(0), emits("some result"));
     });
   });
 }

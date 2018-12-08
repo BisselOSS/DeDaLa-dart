@@ -16,7 +16,7 @@ class Playground<K, V> {
         .connectCache(
             source: MemoryCache(),
             insertPolicy: InsertPolicy.Always(),
-            readPolicy: ReadPolicy.Fallback())
+            readPolicy: ReadPolicy.IfEmpty())
         .connectCache(source: Database());
   }
 }
