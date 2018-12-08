@@ -8,12 +8,27 @@ import 'model/user.dart';
 
 void main() {
   group('A group of tests', () {
-    test('Simple get return in correct order', () {
+    test('Always <-> Always: emits twice and in correct order', () {
       var userCount = 3;
       var users = mockedUsers.take(userCount).toList();
       var userId = 5;
 
       var deDaLa = DeDaLa<int, List<User>>()
+          .connect(
+              readPolicy: ReadPolicy.Always(),
+              readFrom: (id) =>
+                  Observable.just(users).delay(Duration(milliseconds: 20)))
+          .connect(
+              readPolicy: ReadPolicy.Always(),
+              readFrom: (id) => Observable.just(List()));
+
+      var request = deDaLa.get(userId).map((users) => users.length);
+
+      expect(request, emitsInOrder(<int>[userCount, 0]));
+    });
+
+    test('Always <-> Never: emits once', () {
+      var deDaLa = DeDaLa<String, String>()
           .connect(
               readPolicy: ReadPolicy.Always(),
               readFrom: (id) =>
