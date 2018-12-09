@@ -1,7 +1,8 @@
 import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/always_read_policy.dart';
-import 'package:dedala_dart/policy/fallback_read_policy.dart';
-import 'package:dedala_dart/policy/gated_read_policy.dart';
+import 'package:dedala_dart/policy/read/always_read_policy.dart';
+import 'package:dedala_dart/policy/read/fallback_read_policy.dart';
+import 'package:dedala_dart/policy/read/gated_read_policy.dart';
+import 'package:dedala_dart/policy/read/never_read_policy.dart';
 import 'package:meta/meta.dart';
 
 /**
@@ -20,4 +21,6 @@ abstract class ReadPolicy<T> {
       GatedReadPolicy<T>(duration);
 
   static ReadPolicy<T> IfEmpty<T>() => IfEmptyReadPolicy();
+
+  static ReadPolicy<T> Never<T>() => NeverReadPolicy<T>();
 }

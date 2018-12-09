@@ -1,8 +1,9 @@
 import 'package:dedala_dart/cache.dart';
 import 'package:dedala_dart/compose/connect/connector_controller.dart';
 import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
-import 'package:dedala_dart/policy/update_policy.dart';
+import 'package:dedala_dart/policy/insert/insert_policy.dart';
+import 'package:dedala_dart/policy/read/read_policy.dart';
+import 'package:dedala_dart/util/functions.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 

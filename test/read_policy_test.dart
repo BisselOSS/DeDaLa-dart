@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:dedala_dart/de_da_la.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
+import 'package:dedala_dart/policy/read/read_policy.dart';
+import 'package:dedala_dart/util/functions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 
@@ -7,8 +10,8 @@ import 'model/mock.dart';
 import 'model/user.dart';
 
 void main() {
-  group('A group of tests', () {
-    test('Always <-> Always: emits twice and in correct order', () {
+  group('Always ReadPolicy', () {
+    test('Emits always and in correct order', () {
       var userCount = 3;
       var users = mockedUsers.take(userCount).toList();
       var userId = 5;
@@ -26,8 +29,10 @@ void main() {
 
       expect(request, emitsInOrder(<int>[userCount, 0]));
     });
+  });
 
-    test('IfEmpty: reads second cache if previous cache was empty', () {
+  group('IfEmpty ReadPolicy', () {
+    test('Reads second cache if previous cache was empty', () {
       var deDaLa = DeDaLa<int, String>()
           .connect(readFrom: (id) => Observable<String>.just(null))
           .connect(
@@ -37,8 +42,7 @@ void main() {
       expect(deDaLa.get(0), emitsInOrder(<String>[null, "Hey there"]));
     });
 
-    test('IfEmpty: does not read second cache if previous cache has content',
-        () {
+    test('Does not read second cache if previous cache has content', () {
       var deDaLa = DeDaLa<int, String>()
           .connect(readFrom: (id) => Observable<String>.just("some result"))
           .connect(
@@ -48,4 +52,36 @@ void main() {
       expect(deDaLa.get(0), emits("some result"));
     });
   });
+
+  group('Gated ReadPolicy', () {
+    test('Only emits every 200 milliseconds', () {
+      var requestIndex = -1;
+      var requestValues = ["First", "Second", "Third"];
+      var lastRequestTimeStamp = _nowMillis();
+
+      var deDaLa = DeDaLa<int, String>()
+          .connect(
+            readFrom: (id) => Observable.just(null),
+          )
+          .connect(
+              readPolicy:
+                  ReadPolicy.Gated(duration: Duration(milliseconds: 200)),
+              readFrom: (id) {
+                expect(lastRequestTimeStamp > 200, true);
+                lastRequestTimeStamp = _nowMillis() - lastRequestTimeStamp;
+
+                requestIndex++;
+                return Observable<String>.just(requestValues[requestIndex]);
+              });
+
+      expect(deDaLa.get(0).where(notNull), emits("First"));
+      expect(deDaLa.get(0).where(notNull), emits("First"));
+
+      Future.delayed(Duration(milliseconds: 200), () {
+        expect(deDaLa.get(0).where(notNull), emits("Second"));
+      });
+    });
+  });
 }
+
+int _nowMillis() => DateTime.now().millisecondsSinceEpoch;
