@@ -16,6 +16,7 @@ class CacheConnectionController<T> implements ComposeEnvironment<T> {
   /**
    * Private
    */
+
   StreamController<T> _streamController;
   OnStart<T> onStart;
   List<StreamSubscription<T>> _subscriptions = List();
@@ -40,23 +41,17 @@ class CacheConnectionController<T> implements ComposeEnvironment<T> {
    */
 
   @override
-  void add(T event) {
-    print("emitted event: $event");
-    _streamController.add(event);
-  }
+  void add(T event) => _streamController.add(event);
 
   @override
-  void addSubscription(StreamSubscription<T> subscription) {
-    _subscriptions.add(subscription);
-  }
+  void addSubscription(StreamSubscription<T> subscription) =>
+      _subscriptions.add(subscription);
 
   /**
    * StreamController events
    */
 
-  void _onStart() {
-    onStart(this);
-  }
+  void _onStart() => onStart(this);
 
   void _onCancel() =>
       _subscriptions.forEach((subscription) => subscription.cancel());

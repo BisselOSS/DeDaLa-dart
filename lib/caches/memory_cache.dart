@@ -10,7 +10,7 @@ class MemoryCache<K, V> implements Cache<K, V> {
   Observable<V> get(K key) => Observable.just(_map[key]);
 
   @override
-  Observable<void> set(K key, V value) {
+  Observable<V> set(K key, V value) {
     _map[key] = value;
     return Observable.just(value);
   }

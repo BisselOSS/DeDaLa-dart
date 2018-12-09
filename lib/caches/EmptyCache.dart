@@ -8,5 +8,5 @@ class EmptyCache<K, V> implements Cache<K, V> {
   Observable<V> get(K key) => Observable.just(null);
 
   @override
-  Observable<void> set(K key, V value) => Observable.just(value);
+  Observable<V> set(K key, V value) => Observable.just(value);
 }

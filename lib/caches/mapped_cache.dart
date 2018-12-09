@@ -20,6 +20,6 @@ class MappedCache<K, From, To> implements Cache<K, To> {
       _first.get(key).map((value) => this._transform(value));
 
   @override
-  Observable set(K key, To value) =>
-      _first.set(key, this._transformInverse(value));
+  Observable<To> set(K key, To value) =>
+      _first.set(key, this._transformInverse(value)).map(_transform);
 }

@@ -3,12 +3,12 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 typedef Observable<V> FixedGet<V>();
-typedef Observable FixedSet<V>(V value);
+typedef Observable<V> FixedSet<K, V>(V value);
 
 @immutable
 class FixedCache<K, V> implements Cache<K, V> {
   final FixedGet<V> readFrom;
-  final FixedSet<V> insertTo;
+  final FixedSet<K, V> insertTo;
   final String name;
 
   FixedCache({@required this.readFrom, @required this.insertTo, this.name});
@@ -17,5 +17,5 @@ class FixedCache<K, V> implements Cache<K, V> {
   Observable<V> get(K key) => readFrom();
 
   @override
-  Observable<void> set(K key, V value) => insertTo(value);
+  Observable<V> set(K key, V value) => insertTo(value);
 }

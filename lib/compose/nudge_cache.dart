@@ -14,5 +14,5 @@ class NudgeCache<K, V> implements Cache<K, V> {
       .flatMap((value) => set(key, value).map((_) => value));
 
   @override
-  Observable<void> set(K key, V value) => sourceCache.set(key, value);
+  Observable<V> set(K key, V value) => sourceCache.set(key, value);
 }

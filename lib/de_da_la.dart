@@ -1,8 +1,8 @@
 import 'package:dedala_dart/cache.dart';
 import 'package:dedala_dart/caches/lambda_cache.dart';
 import 'package:dedala_dart/compose/cache_connection.dart';
-import 'package:dedala_dart/policy/insert/insert_policy.dart';
-import 'package:dedala_dart/policy/read/read_policy.dart';
+import 'package:dedala_dart/policy/insert_policy.dart';
+import 'package:dedala_dart/policy/read_policy.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -41,13 +41,18 @@ class DeDaLa<K, V> implements Cache<K, V> {
       return DeDaLa._internal(source);
     }
 
-    var cache = CacheConnection(this, source, readPolicy, insertPolicy);
-    return DeDaLa._internal(cache);
+    return DeDaLa._internal(
+      CacheConnection.fromPolicy(
+          first: _cache,
+          second: source,
+          readPolicy: readPolicy,
+          insertPolicy: insertPolicy),
+    );
   }
 
   @override
   Observable<V> get(K key) => _cache.get(key);
 
   @override
-  Observable<void> set(K key, V value) => _cache.set(key, value);
+  Observable<V> set(K key, V value) => _cache.set(key, value);
 }

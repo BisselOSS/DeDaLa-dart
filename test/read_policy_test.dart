@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:dedala_dart/de_da_la.dart';
-import 'package:dedala_dart/policy/read/read_policy.dart';
+import 'package:dedala_dart/policy/read_policy.dart';
 import 'package:dedala_dart/util/functions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';

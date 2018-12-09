@@ -4,4 +4,6 @@ class Optional<T> {
   Optional(this.value);
 
   bool get isPresent => value != null;
+
+  bool get isNotPresent => !isPresent;
 }

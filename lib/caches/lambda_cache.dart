@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 typedef Observable<V> Get<K, V>(K key);
-typedef Observable Set<K, V>(K key, V value);
+typedef Observable<V> Set<K, V>(K key, V value);
 
 @immutable
 class LambdaCache<K, V> implements Cache<K, V> {
@@ -16,5 +16,5 @@ class LambdaCache<K, V> implements Cache<K, V> {
   Observable<V> get(K key) => readFrom(key);
 
   @override
-  Observable<void> set(K key, V value) => insertTo(key, value);
+  Observable<V> set(K key, V value) => insertTo(key, value);
 }

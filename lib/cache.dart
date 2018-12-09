@@ -9,5 +9,5 @@ abstract class Cache<K, V> {
 
   Observable<V> get(K key);
 
-  Observable<void> set(K key, V value);
+  Observable<V> set(K key, V value);
 }
