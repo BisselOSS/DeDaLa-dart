@@ -1,3 +1,5 @@
+import 'package:dedala_dart/cache.dart';
+import 'package:dedala_dart/compose/read_connector.dart';
 import 'package:dedala_dart/optional.dart';
 import 'package:meta/meta.dart';
 
@@ -6,37 +8,46 @@ import 'package:meta/meta.dart';
  */
 typedef bool ReadCondition<T>(Optional<T> item);
 
-class ReadPolicy<T> {
-  final ReadCondition<T> readCondition;
+abstract class ReadPolicy<K, V> {
+  ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second);
 
-  ReadPolicy({@required this.readCondition});
+  static ReadPolicy<K, V> Always<K, V>() =>
+      ConditionalReadPolicy((optional) => true);
 
-  static ReadPolicy<T> Always<T>() =>
-      ReadPolicy(readCondition: (optional) => true);
-
-  static ReadPolicy<T> Gated<T>({@required Duration duration}) =>
+  static ReadPolicy<K, V> Gated<K, V>({@required Duration duration}) =>
       _GatedReadPolicy(duration);
 
-  static ReadPolicy<T> IfEmpty<T>() =>
-      ReadPolicy(readCondition: (optional) => optional.isNotPresent);
+  static ReadPolicy<K, V> IfEmpty<K, V>() =>
+      ConditionalReadPolicy((optional) => optional.isNotPresent);
 
-  static ReadPolicy<T> Never<T>() =>
-      ReadPolicy(readCondition: (optional) => false);
+  static ReadPolicy<K, V> Never<K, V>() =>
+      ConditionalReadPolicy((optional) => false);
+}
+
+class ConditionalReadPolicy<K, V> implements ReadPolicy<K, V> {
+  final ReadCondition<V> readCondition;
+
+  ConditionalReadPolicy(this.readCondition);
+
+  @override
+  ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
+      ConditionalReadConnector(first, second, readCondition);
 }
 
 @immutable
-class _GatedReadPolicy<T> implements ReadPolicy<T> {
+class _GatedReadPolicy<K, V> implements ReadPolicy<K, V> {
   final _Gate gate;
 
   _GatedReadPolicy(Duration duration) : gate = _Gate(duration);
 
   @override
-  ReadCondition<T> get readCondition => (Optional<T> item) {
+  ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
+      ConditionalReadConnector(first, second, (Optional<V> item) {
         if (!gate.isOpen) return false;
 
         gate.open();
         return true;
-      };
+      });
 }
 
 class _Gate {

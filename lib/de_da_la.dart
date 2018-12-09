@@ -15,9 +15,9 @@ class DeDaLa<K, V> implements Cache<K, V> {
 
   DeDaLa<K, V> connect(
       {Get<K, V> readFrom,
-      ReadPolicy<V> readPolicy,
+      ReadPolicy<K, V> readPolicy,
       Set<K, V> insertTo,
-      InsertPolicy<V> insertPolicy}) {
+      InsertPolicy<K, V> insertPolicy}) {
     if (readFrom == null) readFrom = (key) => Observable.just(null);
     if (readPolicy == null) readPolicy = ReadPolicy.Always();
 
@@ -32,8 +32,8 @@ class DeDaLa<K, V> implements Cache<K, V> {
 
   DeDaLa<K, V> connectCache(
       {@required Cache<K, V> source,
-      InsertPolicy<V> insertPolicy,
-      ReadPolicy<V> readPolicy}) {
+      InsertPolicy<K, V> insertPolicy,
+      ReadPolicy<K, V> readPolicy}) {
     //TODO
     // find better way of handling this
     // since this will ignore all insert and read polices for the first cache

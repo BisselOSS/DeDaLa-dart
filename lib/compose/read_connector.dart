@@ -9,13 +9,13 @@ abstract class ReadConnector<K, V> {
   Observable<V> get(K key);
 }
 
-class PolicyDrivenReadConnector<K, V> implements ReadConnector<K, V> {
+class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
   final Cache<K, V> first;
   final Cache<K, V> second;
 
-  final ReadPolicy<V> readPolicy;
+  final ReadCondition<V> readCondition;
 
-  PolicyDrivenReadConnector(this.first, this.second, this.readPolicy);
+  ConditionalReadConnector(this.first, this.second, this.readCondition);
 
   @override
   Observable<V> get(K key) =>
@@ -24,7 +24,7 @@ class PolicyDrivenReadConnector<K, V> implements ReadConnector<K, V> {
           first.get(key).map(box).listen((event) {
             env.add(event);
 
-            var shouldRead = readPolicy.readCondition(event);
+            var shouldRead = readCondition(event);
 
             if (shouldRead) {
               env.addSubscription(

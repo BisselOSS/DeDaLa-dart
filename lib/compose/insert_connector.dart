@@ -7,17 +7,17 @@ abstract class InsertConnector<K, V> {
   Observable<V> set(K key, V value);
 }
 
-class PolicyDrivenInsertConnector<K, V> implements InsertConnector<K, V> {
+class ConditionalInsertConnector<K, V> implements InsertConnector<K, V> {
   final Cache<K, V> first;
   final Cache<K, V> second;
 
-  final InsertPolicy<V> insertPolicy;
+  final InsertCondition<V> insertCondition;
 
-  PolicyDrivenInsertConnector(this.first, this.second, this.insertPolicy);
+  ConditionalInsertConnector(this.first, this.second, this.insertCondition);
 
   @override
   Observable<V> set(K key, V value) {
-    var shouldInsert = insertPolicy.insertCondition(Optional(value));
+    var shouldInsert = insertCondition(Optional(value));
 
     var finalObservable = Observable.just<void>("");
     if (shouldInsert) {

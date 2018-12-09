@@ -14,11 +14,10 @@ class CacheConnection<K, V> implements Cache<K, V> {
   CacheConnection.fromPolicy(
       {@required Cache<K, V> first,
       @required Cache<K, V> second,
-      @required ReadPolicy<V> readPolicy,
-      @required InsertPolicy<V> insertPolicy})
-      : readConnector = PolicyDrivenReadConnector(first, second, readPolicy),
-        insertConnector =
-            PolicyDrivenInsertConnector(first, second, insertPolicy);
+      @required ReadPolicy<K, V> readPolicy,
+      @required InsertPolicy<K, V> insertPolicy})
+      : readConnector = readPolicy.createConnector(first, second),
+        insertConnector = insertPolicy.createConnector(first, second);
 
   @override
   Observable<V> get(K key) => readConnector.get(key);
