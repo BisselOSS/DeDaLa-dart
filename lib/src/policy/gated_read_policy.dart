@@ -44,7 +44,7 @@ class _GatedReadConnector<K, V> implements ReadConnector<K, V> {
           } else {
             env.addSubscription(second.get(key).map(box).listen((value2) {
               lastValue = value2;
-              gate.open();
+              gate.close();
               env.add(value2);
             }));
           }
