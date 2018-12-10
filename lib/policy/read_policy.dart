@@ -1,6 +1,7 @@
 import 'package:dedala_dart/cache.dart';
 import 'package:dedala_dart/compose/read_connector.dart';
 import 'package:dedala_dart/optional.dart';
+import 'package:dedala_dart/policy/gated_read_policy.dart';
 import 'package:meta/meta.dart';
 
 /**
@@ -15,7 +16,7 @@ abstract class ReadPolicy<K, V> {
       ConditionalReadPolicy((optional) => true);
 
   static ReadPolicy<K, V> Gated<K, V>({@required Duration duration}) =>
-      _GatedReadPolicy(duration);
+      GatedReadPolicy(duration);
 
   static ReadPolicy<K, V> IfEmpty<K, V>() =>
       ConditionalReadPolicy((optional) => optional.isNotPresent);
@@ -32,37 +33,4 @@ class ConditionalReadPolicy<K, V> implements ReadPolicy<K, V> {
   @override
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
       ConditionalReadConnector(first, second, readCondition);
-}
-
-@immutable
-class _GatedReadPolicy<K, V> implements ReadPolicy<K, V> {
-  final _Gate gate;
-
-  _GatedReadPolicy(Duration duration) : gate = _Gate(duration);
-
-  @override
-  ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
-      ConditionalReadConnector(first, second, (Optional<V> item) {
-        if (!gate.isOpen) return false;
-
-        gate.open();
-        return true;
-      });
-}
-
-class _Gate {
-  final Duration duration;
-
-  _Gate(this.duration);
-
-  int lastOpen = 0;
-
-  bool get isOpen {
-    var now = DateTime.now().millisecond;
-    return now - lastOpen > duration.inMilliseconds;
-  }
-
-  void open() {
-    lastOpen = DateTime.now().millisecond;
-  }
 }
