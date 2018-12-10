@@ -1,6 +1,6 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/compose/insert_connector.dart';
-import 'package:dedala_dart/optional.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/compose/insert_connector.dart';
+import 'package:dedala_dart/src/optional.dart';
 
 /**
  * Decides if the cache should be updated

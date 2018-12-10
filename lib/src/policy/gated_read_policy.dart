@@ -1,17 +1,18 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/compose/cache_connection_controller.dart';
-import 'package:dedala_dart/compose/read_connector.dart';
-import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
-import 'package:dedala_dart/util/functions.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/compose/cache_connection_controller.dart';
+import 'package:dedala_dart/src/compose/read_connector.dart';
+import 'package:dedala_dart/src/optional.dart';
+import 'package:dedala_dart/src/policy/read_policy.dart';
+import 'package:dedala_dart/src/util/functions.dart';
+import 'package:dedala_dart/src/util/gate.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/src/observables/observable.dart';
 
 @immutable
 class GatedReadPolicy<K, V> implements ReadPolicy<K, V> {
-  final _Gate gate;
+  final Gate gate;
 
-  GatedReadPolicy(Duration duration) : gate = _Gate(duration);
+  GatedReadPolicy(Duration duration) : gate = Gate(duration);
 
   @override
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
@@ -22,7 +23,7 @@ class _GatedReadConnector<K, V> implements ReadConnector<K, V> {
   final Cache<K, V> first;
   final Cache<K, V> second;
 
-  final _Gate gate;
+  final Gate gate;
 
   _GatedReadConnector(this.first, this.second, this.gate);
 
@@ -51,23 +52,4 @@ class _GatedReadConnector<K, V> implements ReadConnector<K, V> {
 
         return env;
       }).stream.map(unbox);
-}
-
-class _Gate {
-  final Duration duration;
-
-  _Gate(this.duration);
-
-  int lastOpen = 0;
-
-  bool get isOpen {
-    var now = DateTime.now().millisecond;
-    return now - lastOpen > duration.inMilliseconds;
-  }
-
-  bool get isClosed => !isOpen;
-
-  void open() {
-    lastOpen = DateTime.now().millisecond;
-  }
 }

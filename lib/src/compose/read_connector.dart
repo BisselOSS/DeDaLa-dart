@@ -1,8 +1,8 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/compose/cache_connection_controller.dart';
-import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
-import 'package:dedala_dart/util/functions.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/compose/cache_connection_controller.dart';
+import 'package:dedala_dart/src/optional.dart';
+import 'package:dedala_dart/src/policy/read_policy.dart';
+import 'package:dedala_dart/src/util/functions.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class ReadConnector<K, V> {

@@ -1,4 +1,4 @@
-import 'package:dedala_dart/cache.dart';
+import 'package:dedala_dart/src/cache.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/src/observables/observable.dart';
 

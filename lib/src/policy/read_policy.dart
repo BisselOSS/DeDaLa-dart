@@ -1,7 +1,7 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/compose/read_connector.dart';
-import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/gated_read_policy.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/compose/read_connector.dart';
+import 'package:dedala_dart/src/optional.dart';
+import 'package:dedala_dart/src/policy/gated_read_policy.dart';
 import 'package:meta/meta.dart';
 
 /**

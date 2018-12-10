@@ -1,8 +1,8 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/compose/insert_connector.dart';
-import 'package:dedala_dart/compose/read_connector.dart';
-import 'package:dedala_dart/policy/insert_policy.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/compose/insert_connector.dart';
+import 'package:dedala_dart/src/compose/read_connector.dart';
+import 'package:dedala_dart/src/policy/insert_policy.dart';
+import 'package:dedala_dart/src/policy/read_policy.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 

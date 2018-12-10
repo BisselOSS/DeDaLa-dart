@@ -1,6 +1,6 @@
-import 'package:dedala_dart/cache.dart';
-import 'package:dedala_dart/optional.dart';
-import 'package:dedala_dart/policy/insert_policy.dart';
+import 'package:dedala_dart/src/cache.dart';
+import 'package:dedala_dart/src/optional.dart';
+import 'package:dedala_dart/src/policy/insert_policy.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class InsertConnector<K, V> {

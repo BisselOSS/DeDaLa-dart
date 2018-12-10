@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:dedala_dart/de_da_la.dart';
-import 'package:dedala_dart/policy/read_policy.dart';
-import 'package:dedala_dart/util/functions.dart';
+import 'package:dedala_dart/src/de_da_la.dart';
+import 'package:dedala_dart/src/policy/read_policy.dart';
+import 'package:dedala_dart/src/util/functions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 
@@ -67,6 +67,7 @@ void main() {
               readPolicy:
                   ReadPolicy.Gated(duration: Duration(milliseconds: 200)),
               readFrom: (id) {
+                print("requested!");
                 expect(lastRequestTimeStamp > 200, true);
                 lastRequestTimeStamp = _nowMillis() - lastRequestTimeStamp;
 
