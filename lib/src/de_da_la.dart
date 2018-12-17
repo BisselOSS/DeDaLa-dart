@@ -1,6 +1,7 @@
 import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/caches/lambda_cache.dart';
 import 'package:dedala_dart/src/compose/cache_connection.dart';
+import 'package:dedala_dart/src/compose/nudge_cache.dart';
 import 'package:dedala_dart/src/policy/insert_policy.dart';
 import 'package:dedala_dart/src/policy/read_policy.dart';
 import 'package:meta/meta.dart';
@@ -19,7 +20,7 @@ class DeDaLa<K, V> implements Cache<K, V> {
       Set<K, V> insertTo,
       InsertPolicy<K, V> insertPolicy}) {
     if (readFrom == null) readFrom = (key) => Observable.just(null);
-    if (readPolicy == null) readPolicy = ReadPolicy.Always();
+    if (readPolicy == null) readPolicy = ReadPolicy.Never();
 
     if (insertTo == null) insertTo = (key, item) => Observable<V>.just(item);
     if (insertPolicy == null) insertPolicy = InsertPolicy.Always();
@@ -51,7 +52,7 @@ class DeDaLa<K, V> implements Cache<K, V> {
   }
 
   @override
-  Observable<V> get(K key) => _cache.get(key);
+  Observable<V> get(K key) => NudgeCache(_cache).get(key);
 
   @override
   Observable<V> set(K key, V value) => _cache.set(key, value);
