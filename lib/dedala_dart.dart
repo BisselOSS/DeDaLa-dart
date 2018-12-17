@@ -3,6 +3,4 @@
 /// More dartdocs go here.
 library dedala_dart;
 
-export 'src/dedala_dart_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'package:dedala_dart/dedala_dart.dart';

@@ -36,7 +36,7 @@ void main() {
       var deDaLa = DeDaLa<int, String>()
           .connect(readFrom: (id) => Observable<String>.just(null))
           .connect(
-              readPolicy: ReadPolicy.IfEmpty(),
+              readPolicy: ReadPolicy.IfDownstreamEmpty(),
               readFrom: (id) => Observable.just("Hey there"));
 
       expect(deDaLa.get(0), emitsInOrder(<String>[null, "Hey there"]));
@@ -46,7 +46,7 @@ void main() {
       var deDaLa = DeDaLa<int, String>()
           .connect(readFrom: (id) => Observable<String>.just("some result"))
           .connect(
-              readPolicy: ReadPolicy.IfEmpty(),
+              readPolicy: ReadPolicy.IfDownstreamEmpty(),
               readFrom: (id) => Observable.just("Hey there"));
 
       expect(deDaLa.get(0), emits("some result"));

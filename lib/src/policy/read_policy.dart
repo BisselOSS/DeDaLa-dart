@@ -18,8 +18,11 @@ abstract class ReadPolicy<K, V> {
   static ReadPolicy<K, V> Gated<K, V>({@required Duration duration}) =>
       GatedReadPolicy(duration);
 
-  static ReadPolicy<K, V> IfEmpty<K, V>() =>
+  static ReadPolicy<K, V> IfDownstreamEmpty<K, V>() =>
       ConditionalReadPolicy((optional) => optional.isNotPresent);
+
+  static ReadPolicy<K, List<V>> IfDownstreamListEmpty<K, V>() =>
+      ConditionalReadPolicy((optional) => optional.value?.isEmpty);
 
   static ReadPolicy<K, V> Never<K, V>() =>
       ConditionalReadPolicy((optional) => false);
