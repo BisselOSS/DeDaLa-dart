@@ -6,111 +6,103 @@ import 'package:test/test.dart';
 import 'model/user.dart';
 
 void main() {
-  group('Insert InsertPolicy', () {
-    test("Inserts in correct order", () {
-      var testUser1 = User(name: "testuser1", email: "1@test.com");
-      var testUser2 = User(name: "some name", email: "2@test.com");
-      List<User> userList = List();
+  test("Insert InsertPolicy - Inserts in correct order", () {
+    var testUser1 = User(name: "testuser1", email: "1@test.com");
+    var testUser2 = User(name: "some name", email: "2@test.com");
+    List<User> userList = List();
 
-      DeDaLa<int, User>()
-          .connect(
-            readFrom: (id) => Observable.just(testUser1),
-          )
-          .connect(
-            readFrom: (id) => Observable.just(testUser2),
-          )
-          .connect(
-              insertPolicy: InsertPolicy.Always(),
-              insertTo: (int id, User user) {
-                userList.add(user);
-                return Observable.just(user);
-              })
-          .get(0)
-          .listen((user) {
-        expect(userList.length, 2);
-        expect(userList[0], testUser1);
-        expect(userList[1], testUser2);
-      });
+    DeDaLa<int, User>()
+        .connect(
+          readFrom: (id) => Observable.just(testUser1),
+        )
+        .connect(
+          readFrom: (id) => Observable.just(testUser2),
+        )
+        .connect(
+            insertPolicy: InsertPolicy.Always(),
+            insertTo: (int id, User user) {
+              userList.add(user);
+              return Observable.just(user);
+            })
+        .get(0)
+        .listen((user) {
+      expect(userList.length, 2);
+      expect(userList[0], testUser1);
+      expect(userList[1], testUser2);
     });
   });
 
-  group('Never InsertPolicy', () {
-    test("inserts never", () {
-      var testUser1 = User(name: "testuser1", email: "1@test.com");
-      List<User> userList = List();
+  test("Never InsertPolicy - inserts never", () {
+    var testUser1 = User(name: "testuser1", email: "1@test.com");
+    List<User> userList = List();
 
-      DeDaLa<int, User>()
-          .connect(
-            readFrom: (id) => Observable.just(testUser1),
-          )
-          .connect(
-            readFrom: (id) => Observable.just(testUser1),
-          )
-          .connect(
-              insertPolicy: InsertPolicy.Never(),
-              insertTo: (int id, User user) {
-                throw Exception(
-                    "function should not be called if insert policy is \"Never\"");
-              })
-          .get(0)
-          .listen((user) {
-        expect(userList.length, 0);
-      });
+    DeDaLa<int, User>()
+        .connect(
+          readFrom: (id) => Observable.just(testUser1),
+        )
+        .connect(
+          readFrom: (id) => Observable.just(testUser1),
+        )
+        .connect(
+            insertPolicy: InsertPolicy.Never(),
+            insertTo: (int id, User user) {
+              throw Exception(
+                  "function should not be called if insert policy is \"Never\"");
+            })
+        .get(0)
+        .listen((user) {
+      expect(userList.length, 0);
     });
   });
 
-  group('IfUpstreamNotEmpty InsertPolicy', () {
-    test("inserts not null values", () {
-      var testUser1 = User(name: "testuser1", email: "1@test.com");
-      List<User> userList = List();
+  test("IfUpstreamNotEmpty InsertPolicy - inserts not null values", () {
+    var testUser1 = User(name: "testuser1", email: "1@test.com");
+    List<User> userList = List();
 
-      var observable = DeDaLa<int, User>()
-          .connect(
-            readFrom: (id) => Observable.just(null),
-          )
-          .connect(
-            readFrom: (id) => Observable.just(testUser1),
-          )
-          .connect(
-              insertPolicy: InsertPolicy.IfUpstreamNotEmpty(),
-              insertTo: (int id, User user) {
-                assert(userList.isEmpty);
+    var observable = DeDaLa<int, User>()
+        .connect(
+          readFrom: (id) => Observable.just(null),
+        )
+        .connect(
+          readFrom: (id) => Observable.just(testUser1),
+        )
+        .connect(
+            insertPolicy: InsertPolicy.IfUpstreamNotEmpty(),
+            insertTo: (int id, User user) {
+              assert(userList.isEmpty);
 
-                userList.add(user);
-                return Observable.just(user);
-              })
-          .get(0)
-          .map((_) => userList);
+              userList.add(user);
+              return Observable.just(user);
+            })
+        .get(0)
+        .map((_) => userList);
 
-      expect(observable, emits(<User>[testUser1]));
-    });
+    expect(observable, emits(<User>[testUser1]));
   });
 
-  group('IfUpstreamEmpty InsertPolicy', () {
-    test("inserts null values only", () {
-      var testUser1 = User(name: "testuser1", email: "1@test.com");
-      List<User> userList = List();
+  test("IfUpstreamEmpty InsertPolicy - inserts null values only", () {
+    var testUser1 = User(name: "testuser1", email: "1@test.com");
+    List<User> userList = List();
 
-      var observable = DeDaLa<int, User>()
-          .connect(
-            readFrom: (id) => Observable.just(null),
-          )
-          .connect(
-            readFrom: (id) => Observable.just(testUser1),
-          )
-          .connect(
-              insertPolicy: InsertPolicy.IfUpstreamEmpty(),
-              insertTo: (int id, User user) {
-                userList.add(user);
-                return Observable.just(user);
-              })
-          .get(0)
-          .map((_) => userList);
+    var observable = DeDaLa<int, User>()
+        .connect(
+          readFrom: (id) => Observable.just(null),
+        )
+        .connect(
+          readFrom: (id) => Observable.just(testUser1),
+        )
+        .connect(
+            insertPolicy: InsertPolicy.IfUpstreamEmpty(),
+            insertTo: (int id, User user) {
+              userList.add(user);
+              return Observable.just(user);
+            })
+        .get(0)
+        .map((_) => userList);
 
-      expect(
-        observable,
-        emits([null]),
-      );
-    });
+    expect(
+      observable,
+      emits([null]),
+    );
   });
 }
