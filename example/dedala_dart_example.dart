@@ -1,4 +1,5 @@
 import 'package:dedala_dart/src/de_da_la.dart';
+import 'package:dedala_dart/src/policy/insert_policy.dart';
 import 'package:dedala_dart/src/policy/read_policy.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -8,13 +9,21 @@ void main() {
   var api = UserApi();
   var repository = UserRepository();
 
-  DeDaLa<int, User>()
+  var userDeDaLa = DeDaLa<int, User>()
       .connect(
           readPolicy: ReadPolicy.Always(),
-          readFrom: (id) => repository.getUser(id))
+          readFrom: (id) => repository.getUser(id),
+          insertPolicy: InsertPolicy.Always(),
+          insertTo: (int id, User user) => repository.insertUser(user))
       .connect(
           readPolicy: ReadPolicy.IfDownstreamEmpty(),
           readFrom: (id) => api.requestUser(id));
+
+  var myUserId = 5;
+  userDeDaLa.get(myUserId).listen((user) {
+    //handle result
+    print(user.email);
+  });
 }
 
 class UserApi {

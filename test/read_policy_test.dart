@@ -39,7 +39,7 @@ void main() {
               readPolicy: ReadPolicy.IfDownstreamEmpty(),
               readFrom: (id) => Observable.just("Hey there"));
 
-      expect(deDaLa.get(0), emitsInOrder(<String>[null, "Hey there"]));
+      expect(deDaLa.get(0), emitsInOrder(<String>["Hey there"]));
     });
 
     test('Does not read second cache if previous cache has content', () {
@@ -71,6 +71,7 @@ void main() {
                   var diff = DateTime.now().difference(lastNow).inMilliseconds;
                   lastNow = DateTime.now();
 
+                  print("diff to last request: $diff");
                   expect(diff >= gatedDuration.inMilliseconds, true);
                 }).flatMap((_) {
                   requestIndex++;

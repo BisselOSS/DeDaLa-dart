@@ -14,17 +14,27 @@ class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
   final Cache<K, V> second;
 
   final ReadCondition<V> readCondition;
+  final bool discardPrevious;
 
-  ConditionalReadConnector(this.first, this.second, this.readCondition);
+  //TODO create event discarder
+  ConditionalReadConnector(
+    this.first,
+    this.second,
+    this.readCondition,
+    this.discardPrevious,
+  );
 
   @override
   Observable<V> get(K key) =>
       CacheConnectionController<Optional<V>>(onStart: (env) {
         env.addCancelable(
           first.get(key).map(box).listen((event) {
-            env.add(event);
-
             var shouldRead = readCondition(event);
+            var discard = shouldRead && discardPrevious;
+
+            if (!discard) {
+              env.add(event);
+            }
 
             if (shouldRead) {
               env.addCancelable(
