@@ -32,6 +32,6 @@ class UserRepository {
   }
 
   void _insertIntoDatabase(User user) {
-    //somebody implement a database here 😡
+    // do your database stuff here 🤔
   }
 }
