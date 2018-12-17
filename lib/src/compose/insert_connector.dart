@@ -19,7 +19,7 @@ class ConditionalInsertConnector<K, V> implements InsertConnector<K, V> {
   Observable<V> set(K key, V value) {
     var shouldInsert = insertCondition(Optional(value));
 
-    var finalObservable = Observable.just<void>("");
+    var finalObservable = Observable.just(value);
     if (shouldInsert) {
       //start with the second since we are now going up again
       finalObservable = second.set(key, value);

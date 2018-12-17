@@ -19,11 +19,23 @@ class DeDaLa<K, V> implements Cache<K, V> {
       ReadPolicy<K, V> readPolicy,
       Set<K, V> insertTo,
       InsertPolicy<K, V> insertPolicy}) {
-    if (readFrom == null) readFrom = (key) => Observable.just(null);
-    if (readPolicy == null) readPolicy = ReadPolicy.Never();
+    if (readPolicy == null) {
+      readPolicy = readFrom == null ? ReadPolicy.Never() : ReadPolicy.Always();
+    }
 
-    if (insertTo == null) insertTo = (key, item) => Observable<V>.just(item);
-    if (insertPolicy == null) insertPolicy = InsertPolicy.Always();
+    if (readFrom == null) {
+      readFrom = (key) => Observable.just(null);
+    }
+
+    if (insertTo == null) {
+      insertTo = (key, item) {
+        return Observable<V>.just(item);
+      };
+    }
+
+    if (insertPolicy == null) {
+      insertPolicy = InsertPolicy.Always();
+    }
 
     return connectCache(
         source: LambdaCache(readFrom: readFrom, insertTo: insertTo),
