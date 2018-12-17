@@ -19,6 +19,9 @@ abstract class InsertPolicy<K, V> {
   static InsertPolicy<K, V> IfUpstreamNotEmpty<K, V>() =>
       ConditionalInsertPolicy((optional) => optional.isPresent);
 
+  static InsertPolicy<K, V> IfUpstreamEmpty<K, V>() =>
+      ConditionalInsertPolicy((optional) => optional.isNotPresent);
+
   static InsertPolicy<K, List<V>> IfUpstreamListNotEmpty<K, V>() =>
       ConditionalInsertPolicy((optional) => optional.value?.isNotEmpty);
 }

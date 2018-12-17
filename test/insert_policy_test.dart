@@ -84,4 +84,30 @@ void main() {
       });
     });
   });
+
+  group('IfUpstreamEmpty InsertPolicy', () {
+    test("inserts null values only", () {
+      var testUser1 = User(name: "testuser1", email: "1@test.com");
+      List<User> userList = List();
+
+      DeDaLa<int, User>()
+          .connect(
+            readFrom: (id) => Observable.just(null),
+          )
+          .connect(
+            readFrom: (id) => Observable.just(testUser1),
+          )
+          .connect(
+              insertPolicy: InsertPolicy.IfUpstreamEmpty(),
+              insertTo: (int id, User user) {
+                userList.add(user);
+                return Observable.just(user);
+              })
+          .get(0)
+          .listen((user) {
+        expect(userList.length, 1);
+        expect(userList[1], null);
+      });
+    });
+  });
 }
