@@ -57,32 +57,63 @@ void main() {
     test('Only emits every 200 milliseconds', () {
       var requestIndex = -1;
       var requestValues = ["First", "Second", "Third"];
-      var lastRequestTimeStamp = _nowMillis();
+      var lastNow = DateTime.fromMillisecondsSinceEpoch(0);
+      var gatedDuration = Duration(milliseconds: 200);
 
       var deDaLa = DeDaLa<int, String>()
           .connect(
             readFrom: (id) => Observable.just(null),
           )
           .connect(
-              readPolicy:
-                  ReadPolicy.Gated(duration: Duration(milliseconds: 200)),
+              readPolicy: ReadPolicy.Gated(duration: gatedDuration),
               readFrom: (id) {
-                print("requested!");
-                expect(lastRequestTimeStamp > 200, true);
-                lastRequestTimeStamp = _nowMillis() - lastRequestTimeStamp;
+                return Observable.just(true).doOnData((_) {
+                  var diff = DateTime.now().difference(lastNow).inMilliseconds;
+                  lastNow = DateTime.now();
 
-                requestIndex++;
-                return Observable<String>.just(requestValues[requestIndex]);
+                  expect(diff >= gatedDuration.inMilliseconds, true);
+                }).flatMap((_) {
+                  requestIndex++;
+                  var requestValue = requestValues[requestIndex];
+                  return Observable<String>.just(requestValue);
+                });
               });
 
-      expect(deDaLa.get(0).where(notNull), emits("First"));
-      expect(deDaLa.get(0).where(notNull), emits("First"));
+      var publisher = PublishSubject<String>();
 
-      Future.delayed(Duration(milliseconds: 200), () {
-        expect(deDaLa.get(0).where(notNull), emits("Second"));
-      });
+      Future(() {
+        // return "first"
+        deDaLa.get(0).listen(publisher.add);
+        // returns "first" -> gate is closed
+        deDaLa.get(0).listen(publisher.add);
+      })
+          .then((_) => Future.delayed(gatedDuration, () {
+                // returns "second" -> gate is open after delay
+                deDaLa.get(0).listen(publisher.add);
+
+                // returns "second" -> gate is closed again
+                deDaLa.get(0).listen(publisher.add);
+              }))
+          .then((_) => Future.delayed(gatedDuration, () {
+                // returns "third" -> gate is open after delay
+                deDaLa.get(0).listen(publisher.add);
+                // returns "third" -> gate is closed again
+                deDaLa.get(0).listen(publisher.add);
+                // returns "third" -> gate should still be closed
+                deDaLa.get(0).listen(publisher.add);
+              }));
+
+      expect(
+          publisher.stream.where(notNull).doOnData(print),
+          emitsInOrder(<String>[
+            "First",
+            "First",
+            "Second",
+            "Second",
+            "Third",
+            "Third",
+            "Third",
+          ]));
     });
   });
 }
-
-int _nowMillis() => DateTime.now().millisecondsSinceEpoch;

@@ -8,7 +8,7 @@ void main() {
     var initialState = true;
     var duration = Duration(milliseconds: 100);
 
-    var gate = Gate(duration, isOpen: initialState);
+    var gate = Gate(duration, initialValue: initialState);
 
     // test initial State
     expect(gate.isOpen, initialState);

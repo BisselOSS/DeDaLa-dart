@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 abstract class ComposeEnvironment<T> {
   void add(T event);
 
-  void addSubscription(StreamSubscription<T> subscription);
+  void addCancelable(StreamSubscription<T> subscription);
 }
 
 typedef ComposeEnvironment<T> OnStart<T>(
@@ -44,7 +44,7 @@ class CacheConnectionController<T> implements ComposeEnvironment<T> {
   void add(T event) => _streamController.add(event);
 
   @override
-  void addSubscription(StreamSubscription<T> subscription) =>
+  void addCancelable(StreamSubscription<T> subscription) =>
       _subscriptions.add(subscription);
 
   /**

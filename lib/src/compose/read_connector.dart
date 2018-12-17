@@ -20,14 +20,14 @@ class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
   @override
   Observable<V> get(K key) =>
       CacheConnectionController<Optional<V>>(onStart: (env) {
-        env.addSubscription(
+        env.addCancelable(
           first.get(key).map(box).listen((event) {
             env.add(event);
 
             var shouldRead = readCondition(event);
 
             if (shouldRead) {
-              env.addSubscription(
+              env.addCancelable(
                 second.get(key).map(box).listen((event2) {
                   env.add(event2);
                 }),

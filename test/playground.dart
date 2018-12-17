@@ -9,6 +9,8 @@ class Playground<K, V> {
   void play() {
     var api = Api<V>();
 
+    //TODO find better naming "upstream", "downstream"
+
     DeDaLa<K, V>()
         .connect(
             readFrom: (key) => api.requestStuff(),

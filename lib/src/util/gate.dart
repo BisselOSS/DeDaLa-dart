@@ -5,9 +5,7 @@ class Gate {
 
   bool _isOpen;
 
-  Gate(this.duration, {bool isOpen = false}) : _isOpen = isOpen;
-
-  int lastOpen = 0;
+  Gate(this.duration, {bool initialValue = false}) : _isOpen = initialValue;
 
   bool get isOpen => _isOpen;
 
