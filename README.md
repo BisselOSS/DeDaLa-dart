@@ -5,7 +5,7 @@ DeDaLa abstracts this complexity and provides an api that lets you define data f
 
 
 ## Example
-![](assets/without_dedala_code.png)  |  ![](assets/with_dedala_code.png)
+<img src="assets/without_dedala_code.png" width="425"/><img src="assets/with_dedala_code.png" width="425"/> 
 
 
 
