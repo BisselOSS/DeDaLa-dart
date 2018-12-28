@@ -4,7 +4,7 @@ DeDaLa is a library that helps you create complex data layers that contains mult
 DeDaLa abstracts this complexity lets you define data flows in a declarative way!
 
 
-
+### Example
 Lets imaging a data layer that should:
 1. Read the cache
 2. If the cache is empty, read the database
@@ -33,9 +33,17 @@ This Data Layer can be responsible for network requests, caching or providing of
 
 [diagram](assets/deDaLa-diagram.png)
 
-  
+### Principles 
+The Api was design to match the visual representation of the image above. 
+Every ````connect```` / ````connectCache```` will create a layer that has its own read and insert rules defined by a Policy.
+Every Layer is represented by a ````Cache```` that is able to ````get(key)```` and ````set(key, value)```` data.
+````DeDaLa```` itself composes those layers and implements ````Cache```` itself.
+
+This means that your logic component only depends on a simple ````Cache```` to get the data from. This makes mocking and testing easy!
+
+### Customization
 You can easily control when to read or insert your data by using a different ````ReadPolicy```` or ````InsertPolicy````.
-DeDaLa provides commonly used Polices but you can easily create your own!
+DeDaLa provides all the basic Polices but you can easily create your own!
 
 ```dart
 class UserReadPolicy {
