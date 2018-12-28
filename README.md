@@ -1,51 +1,17 @@
 # DeDaLa - Declarative Data Layer
 
-DeDaLa is a library that helps you manage complex data layers that contains multiple asynchronous data sources such as caches, databases or network requests. 
-DeDaLa abstracts this complexity and provides an api that lets you define data flows in a declarative way!
+DeDaLa is a library that helps you create complex data layers that contains multiple asynchronous data sources such as caches, databases or network requests. 
+DeDaLa abstracts this complexity lets you define data flows in a declarative way!
 
 
-## Example
-The following data layer returns a user object. 
-The data layer should:
+
+Lets imaging a data layer that should:
 1. Read the cache
-2. If the cache is empty &rarr; read the database
-3. Request the latest data at the api if last request is older than 1 minute
+2. If the cache is empty, read the database
+3. Get the latest data from the api if last request is older than 1 minute
 4. Save fetched data in the database & cache
 
-Possible example without DeDaLa:
-
-```dart
-  memoryCache.get(myUserId).flatMap<User>((user) {
-    
-    // cache is empty
-    if (user == null) {
-      
-      // check if the database has something
-      return database.getUser(myUserId).flatMap((user) {
-        
-        // database is empty or last request was more than 1 minute ago
-        if (user == null || _isDataExpired(minutes: 1)) {
-          
-          // request data from the api
-          return api.requestUser(myUserId).flatMap((user) {
-            
-            // insert the data
-            return memoryCache
-                .set(myUserId, user)
-                .flatMap((_) => database.insertUser(user));
-          });
-        } else {
-          return Observable.just(user);
-        }
-      });
-    } else {
-      return Observable.just(user);
-    }
-  });
-```
-
-With DeDaLa:
-
+  
 ```dart
   var userDeDaLa = DeDaLa<int, User>()
       .connectCache(source: memoryCache)
@@ -62,6 +28,41 @@ With DeDaLa:
   });
 ```
 
+Most clean architecture examples define a view logic component (BloC/ViewModel/Presenter) that requests data from a Service or Data Layer. 
+This Data Layer can be responsible for network requests, caching or providing offline data from a database. The data flow of the given example could look like this:
+
+[diagram](assets/deDaLa-diagram.png)
+
+  
+You can easily control when to read or insert your data by using a different ````ReadPolicy```` or ````InsertPolicy````.
+DeDaLa provides commonly used Polices but you can easily create your own!
+
+```dart
+class UserReadPolicy {
+  
+  /// This read policy only reads if
+  /// - the previous fetched user does not exists
+  /// - the email is is not null
+  static ReadPolicy<int, User> IfEmailValid() =>
+      ConditionalReadPolicy<int, User>(
+        // if this returns true the data will be read
+        readCondition: (optionalUser) =>
+            optionalUser.isNotPresent || optionalUser.value.email != null,
+      );
+}
+```
+
+If you need more control you can always implement ```ReadPolicy``` or ````InsertPolicy```` and provide a cache connector.
+
+
+----
+- Describe very briefly but clearly what the project does.
+- State if it is out-of-the-box user-friendly, so it’s clear to the user.
+- List its most useful/innovative/noteworthy features.
+- State its goals/what problem(s) it solves.
+- Note and briefly describe any key concepts (technical, philosophical, or both) important to the user’s understanding.
+- Note its development status.
+- Include badges.
 
 ----------
 

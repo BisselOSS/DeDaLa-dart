@@ -12,6 +12,11 @@ void main() {
 
   var myUserId = 5;
 
+  /// The data layer should:
+  ///  1. Read the cache
+  ///  2. If the cache is empty &rarr; read the database
+  ///  3. Request the latest data at the api if last request is older than 1 minute
+  ///  4. Save fetched data in the database & cache
   var userDeDaLa = DeDaLa<int, User>()
       .connectCache(source: memoryCache)
       .connect(
@@ -26,6 +31,7 @@ void main() {
     // handle result
   });
 
+  //TODO remove if not needed anymore
   memoryCache.get(myUserId).flatMap<User>((user) {
     // cache is empty
     if (user == null) {
@@ -48,6 +54,18 @@ void main() {
       return Observable.just(user);
     }
   });
+}
+
+class UserReadPolicy {
+  /// This read policy only reads if
+  /// - the previous fetched user does not exists
+  /// - the email is isNotnull
+  static ReadPolicy<int, User> IfEmailValid() =>
+      ConditionalReadPolicy<int, User>(
+        // if this returns true the data will be read
+        readCondition: (optionalUser) =>
+            optionalUser.isNotPresent || optionalUser.value.email != null,
+      );
 }
 
 bool _isDataExpired({int minutes}) => true;
