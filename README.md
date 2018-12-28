@@ -31,7 +31,7 @@ Lets imaging a data layer that should:
 Most clean architecture examples define a view logic component (BloC/ViewModel/Presenter) that requests data from a Service or Data Layer. 
 This Data Layer can be responsible for network requests, caching or providing offline data from a database. The data flow of the given example could look like this:
 
-[diagram](assets/deDaLa-diagram.png)
+![diagram](assets/deDaLa-diagram.png)
 
 ### Principles 
 The Api was design to match the visual representation of the image above. 
