@@ -14,17 +14,21 @@ The data layer should:
 
 Possible example without DeDaLa:
 
-```dart in html
-
+```dart
   memoryCache.get(myUserId).flatMap<User>((user) {
+    
     // cache is empty
     if (user == null) {
+      
       // check if the database has something
       return database.getUser(myUserId).flatMap((user) {
+        
         // database is empty or last request was more than 1 minute ago
         if (user == null || _isDataExpired(minutes: 1)) {
+          
           // request data from the api
           return api.requestUser(myUserId).flatMap((user) {
+            
             // insert the data
             return memoryCache
                 .set(myUserId, user)
@@ -34,8 +38,9 @@ Possible example without DeDaLa:
           return Observable.just(user);
         }
       });
-    } else
+    } else {
       return Observable.just(user);
+    }
   });
 ```
 
