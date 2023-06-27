@@ -7,7 +7,7 @@ abstract class Cache<K, V> {
     }
   }
 
-  Observable<V> get(K key);
+  Stream<V?> get(K key);
 
-  Observable<V> set(K key, V value);
+  Stream<V?> set(K key, V? value);
 }

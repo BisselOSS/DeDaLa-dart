@@ -27,17 +27,17 @@ void main() {
 }
 
 class UserApi {
-  Observable<User> requestUser(int id) =>
-      Observable.just(User(name: "😎", email: "cool@dude.com"));
+  Stream<User> requestUser(int id) =>
+      Stream.just(User(name: "😎", email: "cool@dude.com"));
 }
 
 class UserRepository {
-  Observable<User> getUser(int id) => Observable.just(null);
+  Stream<User> getUser(int id) => Stream.just(null);
 
-  Observable<User> insertUser(User user) {
+  Stream<User> insertUser(User user) {
     _insertIntoDatabase(user);
     // returns the inserted item
-    return Observable.just(user);
+    return Stream.just(user);
   }
 
   void _insertIntoDatabase(User user) {

@@ -1,13 +1,8 @@
 import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/compose/read_connector.dart';
-import 'package:dedala_dart/src/optional.dart';
 import 'package:dedala_dart/src/policy/gated_read_policy.dart';
-import 'package:meta/meta.dart';
 
-/**
- * Decides if the cache should be read.
- */
-typedef bool ReadCondition<T>(Optional<T> item);
+typedef bool ReadCondition<T>(T? item);
 
 abstract class ReadPolicy<K, V> {
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second);
@@ -18,20 +13,20 @@ abstract class ReadPolicy<K, V> {
         discardPrevious,
       );
 
-  static ReadPolicy<K, V> Gated<K, V>({@required Duration duration}) =>
+  static ReadPolicy<K, V> Gated<K, V>({required Duration duration}) =>
       GatedReadPolicy(duration);
 
   static ReadPolicy<K, V> IfDownstreamEmpty<K, V>(
           {bool discardPrevious = true}) =>
       ConditionalReadPolicy(
-        (optional) => optional.isNotPresent,
+        (optional) => optional != null,
         discardPrevious,
       );
 
   static ReadPolicy<K, List<V>> IfDownstreamListEmpty<K, V>(
           {bool discardPrevious = true}) =>
       ConditionalReadPolicy(
-        (optional) => optional.value?.isEmpty,
+        (optional) => optional?.isEmpty ?? true,
         discardPrevious,
       );
 

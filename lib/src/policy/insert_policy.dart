@@ -1,11 +1,10 @@
 import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/compose/insert_connector.dart';
-import 'package:dedala_dart/src/optional.dart';
 
 /**
  * Decides if the cache should be updated
  */
-typedef bool InsertCondition<T>(Optional<T> item);
+typedef bool InsertCondition<T>(T? item);
 
 abstract class InsertPolicy<K, V> {
   InsertConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second);
@@ -17,13 +16,13 @@ abstract class InsertPolicy<K, V> {
       ConditionalInsertPolicy((optional) => false);
 
   static InsertPolicy<K, V> IfUpstreamNotEmpty<K, V>() =>
-      ConditionalInsertPolicy((optional) => optional.isPresent);
+      ConditionalInsertPolicy((optional) => optional != null);
 
   static InsertPolicy<K, V> IfUpstreamEmpty<K, V>() =>
-      ConditionalInsertPolicy((optional) => optional.isNotPresent);
+      ConditionalInsertPolicy((optional) => optional == null);
 
   static InsertPolicy<K, List<V>> IfUpstreamListNotEmpty<K, V>() =>
-      ConditionalInsertPolicy((optional) => optional.value?.isNotEmpty);
+      ConditionalInsertPolicy((optional) => optional?.isNotEmpty ?? false);
 }
 
 class ConditionalInsertPolicy<K, V> implements InsertPolicy<K, V> {
