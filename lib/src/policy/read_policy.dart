@@ -14,8 +14,8 @@ abstract class ReadPolicy<K, V> {
 
   static ReadPolicy<K, V> Always<K, V>({bool discardPrevious = false}) =>
       ConditionalReadPolicy(
-        (optional) => true,
-        discardPrevious,
+        readCondition: (optional) => true,
+        discardPrevious: discardPrevious,
       );
 
   static ReadPolicy<K, V> Gated<K, V>({@required Duration duration}) =>
@@ -24,21 +24,21 @@ abstract class ReadPolicy<K, V> {
   static ReadPolicy<K, V> IfDownstreamEmpty<K, V>(
           {bool discardPrevious = true}) =>
       ConditionalReadPolicy(
-        (optional) => optional.isNotPresent,
-        discardPrevious,
+        readCondition: (optional) => optional.isNotPresent,
+        discardPrevious: discardPrevious,
       );
 
   static ReadPolicy<K, List<V>> IfDownstreamListEmpty<K, V>(
           {bool discardPrevious = true}) =>
       ConditionalReadPolicy(
-        (optional) => optional.value?.isEmpty,
-        discardPrevious,
+        readCondition: (optional) => optional.value?.isEmpty,
+        discardPrevious: discardPrevious,
       );
 
   static ReadPolicy<K, V> Never<K, V>({bool discardPrevious = true}) =>
       ConditionalReadPolicy(
-        (optional) => false,
-        discardPrevious,
+        readCondition: (optional) => false,
+        discardPrevious: discardPrevious,
       );
 }
 
@@ -46,7 +46,8 @@ class ConditionalReadPolicy<K, V> implements ReadPolicy<K, V> {
   final ReadCondition<V> readCondition;
   final bool discardPrevious;
 
-  ConditionalReadPolicy(this.readCondition, this.discardPrevious);
+  ConditionalReadPolicy(
+      {@required this.readCondition, this.discardPrevious = true});
 
   @override
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
