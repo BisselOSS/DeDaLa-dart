@@ -19,10 +19,10 @@ void main() {
         .connect(
             readPolicy: ReadPolicy.Always(),
             readFrom: (id) =>
-                Observable.just(users).delay(Duration(milliseconds: 20)))
+                Stream.just(users).delay(Duration(milliseconds: 20)))
         .connect(
             readPolicy: ReadPolicy.Always(),
-            readFrom: (id) => Observable.just(List()));
+            readFrom: (id) => Stream.just(List()));
 
     var request = deDaLa.get(userId).map((users) => users.length);
 
@@ -32,20 +32,20 @@ void main() {
   test('IfEmpty ReadPolicy - Reads second cache if previous cache was empty',
       () {
     var deDaLa = DeDaLa<int, String>()
-        .connect(readFrom: (id) => Observable<String>.just(null))
+        .connect(readFrom: (id) => Stream<String>.just(null))
         .connect(
             readPolicy: ReadPolicy.IfDownstreamEmpty(),
-            readFrom: (id) => Observable.just("Hey there"));
+            readFrom: (id) => Stream.just("Hey there"));
 
     expect(deDaLa.get(0), emitsInOrder(<String>["Hey there"]));
   });
 
   test('Does not read second cache if previous cache has content', () {
     var deDaLa = DeDaLa<int, String>()
-        .connect(readFrom: (id) => Observable<String>.just("some result"))
+        .connect(readFrom: (id) => Stream<String>.just("some result"))
         .connect(
             readPolicy: ReadPolicy.IfDownstreamEmpty(),
-            readFrom: (id) => Observable.just("Hey there"));
+            readFrom: (id) => Stream.just("Hey there"));
 
     expect(deDaLa.get(0), emits("some result"));
   });
@@ -58,12 +58,12 @@ void main() {
 
     var deDaLa = DeDaLa<int, String>()
         .connect(
-          readFrom: (id) => Observable.just(null),
+          readFrom: (id) => Stream.just(null),
         )
         .connect(
             readPolicy: ReadPolicy.Gated(duration: gatedDuration),
             readFrom: (id) {
-              return Observable.just(true).doOnData((_) {
+              return Stream.just(true).doOnData((_) {
                 var diff = DateTime.now().difference(lastNow).inMilliseconds;
                 lastNow = DateTime.now();
 
@@ -72,7 +72,7 @@ void main() {
               }).flatMap((_) {
                 requestIndex++;
                 var requestValue = requestValues[requestIndex];
-                return Observable<String>.just(requestValue);
+                return Stream<String>.just(requestValue);
               });
             });
 

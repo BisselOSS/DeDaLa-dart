@@ -1,12 +1,9 @@
 import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/compose/cache_connection_controller.dart';
-import 'package:dedala_dart/src/optional.dart';
 import 'package:dedala_dart/src/policy/read_policy.dart';
-import 'package:dedala_dart/src/util/functions.dart';
-import 'package:rxdart/rxdart.dart';
 
 abstract class ReadConnector<K, V> {
-  Observable<V> get(K key);
+  Stream<V?> get(K key);
 }
 
 class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
@@ -25,10 +22,9 @@ class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
   );
 
   @override
-  Observable<V> get(K key) =>
-      CacheConnectionController<Optional<V>>(onStart: (env) {
+  Stream<V?> get(K key) => CacheConnectionController<V?>(onStart: (env) {
         env.addCancelable(
-          first.get(key).map(box).listen((event) {
+          first.get(key).listen((event) {
             var shouldRead = readCondition(event);
             var discard = shouldRead && discardPrevious;
 
@@ -38,12 +34,12 @@ class ConditionalReadConnector<K, V> implements ReadConnector<K, V> {
 
             if (shouldRead) {
               env.addCancelable(
-                second.get(key).map(box).listen((event2) {
+                second.get(key).listen((event2) {
                   env.add(event2);
                 }),
               );
             }
           }),
         );
-      }).stream.map(unbox);
+      }).stream;
 }

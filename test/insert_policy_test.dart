@@ -13,16 +13,16 @@ void main() {
 
     DeDaLa<int, User>()
         .connect(
-          readFrom: (id) => Observable.just(testUser1),
+          readFrom: (id) => Stream.just(testUser1),
         )
         .connect(
-          readFrom: (id) => Observable.just(testUser2),
+          readFrom: (id) => Stream.just(testUser2),
         )
         .connect(
             insertPolicy: InsertPolicy.Always(),
             insertTo: (int id, User user) {
               userList.add(user);
-              return Observable.just(user);
+              return Stream.just(user);
             })
         .get(0)
         .listen((user) {
@@ -38,10 +38,10 @@ void main() {
 
     DeDaLa<int, User>()
         .connect(
-          readFrom: (id) => Observable.just(testUser1),
+          readFrom: (id) => Stream.just(testUser1),
         )
         .connect(
-          readFrom: (id) => Observable.just(testUser1),
+          readFrom: (id) => Stream.just(testUser1),
         )
         .connect(
             insertPolicy: InsertPolicy.Never(),
@@ -61,10 +61,10 @@ void main() {
 
     var observable = DeDaLa<int, User>()
         .connect(
-          readFrom: (id) => Observable.just(null),
+          readFrom: (id) => Stream.just(null),
         )
         .connect(
-          readFrom: (id) => Observable.just(testUser1),
+          readFrom: (id) => Stream.just(testUser1),
         )
         .connect(
             insertPolicy: InsertPolicy.IfUpstreamNotEmpty(),
@@ -72,7 +72,7 @@ void main() {
               assert(userList.isEmpty);
 
               userList.add(user);
-              return Observable.just(user);
+              return Stream.just(user);
             })
         .get(0)
         .map((_) => userList);
@@ -86,16 +86,16 @@ void main() {
 
     var observable = DeDaLa<int, User>()
         .connect(
-          readFrom: (id) => Observable.just(null),
+          readFrom: (id) => Stream.just(null),
         )
         .connect(
-          readFrom: (id) => Observable.just(testUser1),
+          readFrom: (id) => Stream.just(testUser1),
         )
         .connect(
             insertPolicy: InsertPolicy.IfUpstreamEmpty(),
             insertTo: (int id, User user) {
               userList.add(user);
-              return Observable.just(user);
+              return Stream.just(user);
             })
         .get(0)
         .map((_) => userList);

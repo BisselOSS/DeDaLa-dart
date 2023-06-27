@@ -1,13 +1,10 @@
 import 'package:dedala_dart/src/cache.dart';
-import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 
 /// A Function that converts type T to S
-typedef S Transform<S, T>(T value);
+typedef S Transform<S, T>(T? value);
 
 /// Mapped Caches can be used whenever the Value has to change between two caches
 /// therefore two transformations for both directions is done
-@immutable
 class MappedCache<K, From, To> implements Cache<K, To> {
   final Transform<To, From> _transform;
   final Transform<From, To> _transformInverse;
@@ -16,10 +13,10 @@ class MappedCache<K, From, To> implements Cache<K, To> {
   MappedCache(this._first, this._transform, this._transformInverse);
 
   @override
-  Observable<To> get(K key) =>
+  Stream<To?> get(K key) =>
       _first.get(key).map((value) => this._transform(value));
 
   @override
-  Observable<To> set(K key, To value) =>
+  Stream<To?> set(K key, To? value) =>
       _first.set(key, this._transformInverse(value)).map(_transform);
 }
