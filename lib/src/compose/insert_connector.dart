@@ -3,7 +3,7 @@ import 'package:dedala_dart/src/policy/insert_policy.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class InsertConnector<K, V> {
-  Stream<V?> set(K key, V? value);
+  Stream<V> set(K key, V value);
 }
 
 class ConditionalInsertConnector<K, V> implements InsertConnector<K, V> {
@@ -15,8 +15,8 @@ class ConditionalInsertConnector<K, V> implements InsertConnector<K, V> {
   ConditionalInsertConnector(this.first, this.second, this.insertCondition);
 
   @override
-  Stream<V?> set(K key, V? value) {
-    var shouldInsert = insertCondition(value);
+  Stream<V> set(K key, V value) {
+    final shouldInsert = insertCondition(value);
 
     var finalStream = Stream.value(value);
     if (shouldInsert) {

@@ -4,8 +4,6 @@ import 'package:dedala_dart/src/compose/cache_connection.dart';
 import 'package:dedala_dart/src/compose/nudge_cache.dart';
 import 'package:dedala_dart/src/policy/insert_policy.dart';
 import 'package:dedala_dart/src/policy/read_policy.dart';
-import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 
 class DeDaLa<K, V> implements Cache<K, V> {
   final Cache<K, V>? _cache;
@@ -20,28 +18,26 @@ class DeDaLa<K, V> implements Cache<K, V> {
     Set<K, V>? insertTo,
     InsertPolicy<K, V>? insertPolicy,
   }) {
-    if (readPolicy == null) {
-      readPolicy = readFrom == null ? ReadPolicy.Never() : ReadPolicy.Always();
-    }
+    readPolicy ??= readFrom == null ? ReadPolicy.Never() : ReadPolicy.Always();
 
-    if (readFrom == null) {
-      readFrom = (key) => Stream.value(null);
-    }
+    insertTo ??= (key, item) => Stream.value(item);
 
-    if (insertTo == null) {
-      insertTo = (key, item) {
-        return Stream.value(item);
-      };
-    }
-
-    if (insertPolicy == null) {
-      insertPolicy = InsertPolicy.Always();
-    }
+    insertPolicy ??= InsertPolicy.Always();
 
     return connectCache(
-        source: LambdaCache(readFrom: readFrom, insertTo: insertTo),
-        readPolicy: readPolicy,
-        insertPolicy: insertPolicy);
+      source: LambdaCache(
+        readFrom: (key) {
+          assert(
+            readFrom != null,
+            "$readPolicy allowed a read but not readFrom was specified",
+          );
+          return readFrom!(key);
+        },
+        insertTo: insertTo,
+      ),
+      readPolicy: readPolicy,
+      insertPolicy: insertPolicy,
+    );
   }
 
   DeDaLa<K, V> connectCache({
@@ -67,10 +63,15 @@ class DeDaLa<K, V> implements Cache<K, V> {
     );
   }
 
-  // TODO: We can't forceunwrap here
   @override
-  Stream<V?> get(K key) => NudgeCache<K, V>(_cache!).get(key);
+  Stream<V> get(K key) {
+    assert(_cache != null, "Empty DeDaLa.");
+    return NudgeCache<K, V>(_cache!).get(key);
+  }
 
   @override
-  Stream<V?> set(K key, V? value) => _cache!.set(key, value);
+  Stream<V> set(K key, V value) {
+    assert(_cache != null, "Empty DeDaLa.");
+    return _cache!.set(key, value);
+  }
 }

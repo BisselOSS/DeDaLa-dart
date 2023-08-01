@@ -2,7 +2,7 @@ import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/compose/read_connector.dart';
 import 'package:dedala_dart/src/policy/gated_read_policy.dart';
 
-typedef bool ReadCondition<T>(T? item);
+typedef ReadCondition<T> = bool Function(T? item);
 
 abstract class ReadPolicy<K, V> {
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second);

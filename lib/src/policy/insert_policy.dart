@@ -1,10 +1,8 @@
 import 'package:dedala_dart/src/cache.dart';
 import 'package:dedala_dart/src/compose/insert_connector.dart';
 
-/**
- * Decides if the cache should be updated
- */
-typedef bool InsertCondition<T>(T? item);
+/// Decides if the cache should be updated
+typedef InsertCondition<T> = bool Function(T? item);
 
 abstract class InsertPolicy<K, V> {
   InsertConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second);

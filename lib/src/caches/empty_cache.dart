@@ -1,8 +1,9 @@
-import 'package:dedala_dart/src/cache.dart';
 import 'package:meta/meta.dart';
 
+import '../cache.dart';
+
 @immutable
-class EmptyCache<K, V> implements Cache<K, V> {
+class EmptyCache<K, V> implements Cache<K, V?> {
   @override
   Stream<V?> get(K key) => Stream.value(null);
 

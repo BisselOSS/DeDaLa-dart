@@ -10,7 +10,7 @@ import 'package:rxdart/rxdart.dart';
 class GatedReadPolicy<K, V> implements ReadPolicy<K, V> {
   final Duration duration;
 
-  GatedReadPolicy(this.duration);
+  const GatedReadPolicy(this.duration);
 
   @override
   ReadConnector<K, V> createConnector(Cache<K, V> first, Cache<K, V> second) =>
@@ -26,12 +26,12 @@ class _GatedReadConnector<K, V> implements ReadConnector<K, V> {
   _GatedReadConnector(this.first, this.second, this.duration)
       : gate = Gate(duration, initialValue: true);
 
-  final lastValue = PublishSubject<V?>();
+  final lastValue = PublishSubject<V>();
 
   final lastNow = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
-  Stream<V?> get(K key) => CacheConnectionController<V?>(onStart: (env) {
+  Stream<V> get(K key) => CacheConnectionController<V>(onStart: (env) {
         if (gate.isOpen) {
           gate.close();
 

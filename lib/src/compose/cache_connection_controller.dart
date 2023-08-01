@@ -1,15 +1,12 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
-
 abstract class ComposeEnvironment<T> {
   void add(T event);
 
   void addCancelable(StreamSubscription<Object?> subscription);
 }
 
-typedef void OnStart<T>(final ComposeEnvironment<T> environment);
+typedef OnStart<T> = void Function(ComposeEnvironment<T> environment);
 
 class CacheConnectionController<T> implements ComposeEnvironment<T> {
   late final _streamController = StreamController<T>(
@@ -22,9 +19,7 @@ class CacheConnectionController<T> implements ComposeEnvironment<T> {
   OnStart<T> onStart;
   final _subscriptions = <StreamSubscription<Object?>>[];
 
-  /**
-   * Public
-   */
+  /// Public
 
   Stream<T> get stream => _streamController.stream;
 
@@ -39,10 +34,11 @@ class CacheConnectionController<T> implements ComposeEnvironment<T> {
 
   void _onStart() => onStart(this);
 
-  void _onCancel() =>
-      _subscriptions.forEach((subscription) => subscription.cancel());
+  void _onCancel() => _subscriptions.forEach(
+        (subscription) => unawaited(subscription.cancel()),
+      );
 
-  void _onPause([Future? resumeSignal]) => _subscriptions
+  void _onPause([Future<void>? resumeSignal]) => _subscriptions
       .forEach((subscription) => subscription.pause(resumeSignal));
 
   void _onResume() =>

@@ -1,5 +1,3 @@
-import 'package:rxdart/rxdart.dart';
-
 abstract class Cache<K, V> {
   Cache() {
     if (K == dynamic || V == dynamic) {
@@ -7,7 +5,7 @@ abstract class Cache<K, V> {
     }
   }
 
-  Stream<V?> get(K key);
+  Stream<V> get(K key);
 
-  Stream<V?> set(K key, V? value);
+  Stream<V> set(K key, V value);
 }

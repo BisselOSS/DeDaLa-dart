@@ -11,74 +11,75 @@ import 'model/user.dart';
 
 void main() {
   test('Always ReadPolicy - Emits always and in correct order', () {
-    var userCount = 3;
-    var users = mockedUsers.take(userCount).toList();
-    var userId = 5;
+    const userCount = 3;
+    final users = mockedUsers.take(userCount).toList();
+    const userId = 5;
 
-    var deDaLa = DeDaLa<int, List<User>>()
+    final deDaLa = DeDaLa<int, List<User>>()
         .connect(
             readPolicy: ReadPolicy.Always(),
             readFrom: (id) =>
-                Stream.just(users).delay(Duration(milliseconds: 20)))
+                Stream.value(users).delay(const Duration(milliseconds: 20)))
         .connect(
             readPolicy: ReadPolicy.Always(),
-            readFrom: (id) => Stream.just(List()));
+            readFrom: (id) => Stream.value([]));
 
-    var request = deDaLa.get(userId).map((users) => users.length);
+    final request = deDaLa.get(userId).map((users) => users.length);
 
     expect(request, emitsInOrder(<int>[userCount, 0]));
   });
 
   test('IfEmpty ReadPolicy - Reads second cache if previous cache was empty',
       () {
-    var deDaLa = DeDaLa<int, String>()
-        .connect(readFrom: (id) => Stream<String>.just(null))
+    final deDaLa = DeDaLa<int, String?>()
+        .connect(readFrom: (id) => Stream<String?>.value(null))
         .connect(
             readPolicy: ReadPolicy.IfDownstreamEmpty(),
-            readFrom: (id) => Stream.just("Hey there"));
+            readFrom: (id) => Stream.value("Hey there"));
 
     expect(deDaLa.get(0), emitsInOrder(<String>["Hey there"]));
   });
 
   test('Does not read second cache if previous cache has content', () {
-    var deDaLa = DeDaLa<int, String>()
-        .connect(readFrom: (id) => Stream<String>.just("some result"))
+    final deDaLa = DeDaLa<int, String>()
+        .connect(readFrom: (id) => Stream<String>.value("some result"))
         .connect(
             readPolicy: ReadPolicy.IfDownstreamEmpty(),
-            readFrom: (id) => Stream.just("Hey there"));
+            readFrom: (id) => Stream.value("Hey there"));
 
     expect(deDaLa.get(0), emits("some result"));
   });
 
-  test('Gated ReadPolicy - Only emits every 200 milliseconds', () {
+  test('Gated ReadPolicy - Only emits every 200 milliseconds', () async {
     var requestIndex = -1;
-    var requestValues = ["First", "Second", "Third"];
+    final requestValues = ["First", "Second", "Third"];
     var lastNow = DateTime.fromMillisecondsSinceEpoch(0);
-    var gatedDuration = Duration(milliseconds: 200);
+    const gatedDuration = Duration(milliseconds: 200);
 
-    var deDaLa = DeDaLa<int, String>()
+    final deDaLa = DeDaLa<int, String?>()
         .connect(
-          readFrom: (id) => Stream.just(null),
+          readFrom: (id) => Stream.value(null),
         )
         .connect(
             readPolicy: ReadPolicy.Gated(duration: gatedDuration),
             readFrom: (id) {
-              return Stream.just(true).doOnData((_) {
-                var diff = DateTime.now().difference(lastNow).inMilliseconds;
+              return Stream.value(true).doOnData((_) {
+                final diff = DateTime.now().difference(lastNow).inMilliseconds;
                 lastNow = DateTime.now();
 
                 print("diff to last request: $diff");
                 expect(diff >= gatedDuration.inMilliseconds, true);
               }).flatMap((_) {
                 requestIndex++;
-                var requestValue = requestValues[requestIndex];
-                return Stream<String>.just(requestValue);
+                final requestValue = requestValues[requestIndex];
+                return Stream<String>.value(requestValue);
               });
             });
 
-    var publisher = PublishSubject<String>();
+    final publisher = PublishSubject<String?>();
+    addTearDown(publisher.close);
 
-    Future(() {
+    await Future(() {
       // return "first"
       deDaLa.get(0).listen(publisher.add);
       // returns "first" -> gate is closed

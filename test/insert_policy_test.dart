@@ -1,108 +1,97 @@
 import 'package:dedala_dart/src/de_da_la.dart';
 import 'package:dedala_dart/src/policy/insert_policy.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 
 import 'model/user.dart';
 
 void main() {
-  test("Insert InsertPolicy - Inserts in correct order", () {
-    var testUser1 = User(name: "testuser1", email: "1@test.com");
-    var testUser2 = User(name: "some name", email: "2@test.com");
-    List<User> userList = List();
+  test("Insert InsertPolicy - Inserts in correct order", () async {
+    final testUser1 = User(name: "testuser1", email: "1@test.com");
+    final testUser2 = User(name: "some name", email: "2@test.com");
+    final userList = <User>[];
 
-    DeDaLa<int, User>()
-        .connect(
-          readFrom: (id) => Stream.just(testUser1),
-        )
-        .connect(
-          readFrom: (id) => Stream.just(testUser2),
-        )
+    await DeDaLa<int, User>()
+        .connect(readFrom: (id) => Stream.value(testUser1))
+        .connect(readFrom: (id) => Stream.value(testUser2))
         .connect(
             insertPolicy: InsertPolicy.Always(),
             insertTo: (int id, User user) {
               userList.add(user);
-              return Stream.just(user);
+              return Stream.value(user);
             })
         .get(0)
-        .listen((user) {
-      expect(userList.length, 2);
-      expect(userList[0], testUser1);
-      expect(userList[1], testUser2);
-    });
+        .first;
+
+    expect(userList.length, 2);
+    expect(userList[0], testUser1);
+    expect(userList[1], testUser2);
   });
 
-  test("Never InsertPolicy - inserts never", () {
-    var testUser1 = User(name: "testuser1", email: "1@test.com");
-    List<User> userList = List();
+  test("Never InsertPolicy - inserts never", () async {
+    final testUser1 = User(name: "testuser1", email: "1@test.com");
+    final userList = <User>[];
 
-    DeDaLa<int, User>()
+    await DeDaLa<int, User>()
         .connect(
-          readFrom: (id) => Stream.just(testUser1),
+          readFrom: (id) => Stream.value(testUser1),
         )
         .connect(
-          readFrom: (id) => Stream.just(testUser1),
+          readFrom: (id) => Stream.value(testUser1),
         )
         .connect(
             insertPolicy: InsertPolicy.Never(),
             insertTo: (int id, User user) {
               throw Exception(
-                  "function should not be called if insert policy is \"Never\"");
+                "function should not be called if insert policy is \"Never\"",
+              );
             })
         .get(0)
-        .listen((user) {
-      expect(userList.length, 0);
-    });
+        .first;
+
+    expect(userList.length, 0);
   });
 
   test("IfUpstreamNotEmpty InsertPolicy - inserts not null values", () {
-    var testUser1 = User(name: "testuser1", email: "1@test.com");
-    List<User> userList = List();
+    final testUser1 = User(name: "testuser1", email: "1@test.com");
+    final userList = <User>[];
 
-    var observable = DeDaLa<int, User>()
-        .connect(
-          readFrom: (id) => Stream.just(null),
-        )
-        .connect(
-          readFrom: (id) => Stream.just(testUser1),
-        )
+    final observable = DeDaLa<int, User?>()
+        .connect(readFrom: (id) => Stream.value(null))
+        .connect(readFrom: (id) => Stream.value(testUser1))
         .connect(
             insertPolicy: InsertPolicy.IfUpstreamNotEmpty(),
-            insertTo: (int id, User user) {
-              assert(userList.isEmpty);
+            insertTo: (int id, user) {
+              assert(userList.isEmpty, "Should not be called.");
 
-              userList.add(user);
-              return Stream.just(user);
+              userList.add(user!);
+              return Stream.value(user);
             })
         .get(0)
         .map((_) => userList);
 
-    expect(observable, emits(<User>[testUser1]));
+    expect(observable, emits([testUser1]));
   });
 
   test("IfUpstreamEmpty InsertPolicy - inserts null values only", () {
-    var testUser1 = User(name: "testuser1", email: "1@test.com");
-    List<User> userList = List();
+    final testUser1 = User(name: "testuser1", email: "1@test.com");
+    final userList = <User>[];
 
-    var observable = DeDaLa<int, User>()
+    final observable = DeDaLa<int, User?>()
         .connect(
-          readFrom: (id) => Stream.just(null),
+          readFrom: (id) => Stream.value(null),
         )
         .connect(
-          readFrom: (id) => Stream.just(testUser1),
+          readFrom: (id) => Stream.value(testUser1),
         )
         .connect(
             insertPolicy: InsertPolicy.IfUpstreamEmpty(),
-            insertTo: (int id, User user) {
-              userList.add(user);
-              return Stream.just(user);
+            insertTo: (int id, user) {
+              userList.add(user!);
+              return Stream.value(user);
             })
         .get(0)
         .map((_) => userList);
 
-    expect(
-      observable,
-      emits([null]),
-    );
+    expect(observable, emits([null]));
   });
 }

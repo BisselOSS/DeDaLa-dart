@@ -19,8 +19,8 @@ class CacheConnection<K, V> implements Cache<K, V> {
         insertConnector = insertPolicy.createConnector(first, second);
 
   @override
-  Stream<V?> get(K key) => readConnector.get(key);
+  Stream<V> get(K key) => readConnector.get(key);
 
   @override
-  Stream<V?> set(K key, V? value) => insertConnector.set(key, value);
+  Stream<V> set(K key, V value) => insertConnector.set(key, value);
 }
